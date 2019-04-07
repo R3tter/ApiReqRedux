@@ -1,74 +1,86 @@
 import { refreshToken, reset, setCachedData } from 'App/actions';
-import { errorCodes } from './constants';
-import { parseJSON, getHeaders } from './helpers';
+import { parseJSON, getHeaders } from './utils';
 import { addNotification } from 'Notification/actions';
 import store from 'store';
 
-let refresh = null;
+const defaultErrorCodes = [400, 403, 404, 405, 408, 500, 501, 502, 503, 504];
 
-export const apiRequest = async config => {
+const defaultHeaders = [[['Content-Type', 'application/json']]];
+
+const defaultRefreshExceptions = ['logout', 'auth'];
+
+export const apiRequestRedux = config => {
+  let refresh = null;
   const {
-    url,
-    method = 'GET',
-    body,
-    additionalHeaders,
-    onStart,
-    onError,
-    onSuccess,
-    redux,
-    selector
+    store,
+    refreshFnc,
+    refreshExceptions = defaultRefreshExceptions,
+    headers = defaultHeaders,
+    errorCodes = defaultErrorCodes,
+    onErrorFnc
   } = config;
-  const { getState, dispatch } = store;
-  const { Cached } = getState();
-  const isGet = method === 'GET';
-  try {
-    if (onStart) {
-      redux ? await dispatch(onStart()) : onStart();
-    }
 
-    const payload = !isGet
-      ? JSON.stringify(body || selector(getState()) || {})
-      : null;
+  return async requestConfig => {
+    const {
+      url,
+      method = 'GET',
+      body,
+      additionalHeaders,
+      onStart,
+      onError,
+      onSuccess,
+      selector
+    } = requestConfig;
+    const { getState, dispatch } = store;
+    const isGet = method === 'GET';
+    try {
+      onStart && (await dispatch(onStart()));
 
-    const result = await fetch(url, {
-      method,
-      credentials: 'same-origin',
-      headers: getHeaders(additionalHeaders),
-      body: payload
-    });
+      const payload = !isGet
+        ? JSON.stringify(body || (selector && selector(getState())) || {})
+        : null;
 
-    if (!result.ok) {
-      throw result;
-    }
+      const result = await fetch(url, {
+        method,
+        credentials: 'same-origin',
+        headers: getHeaders(headers, additionalHeaders),
+        body: payload
+      });
 
-    const data = await parseJSON(result);
-
-    if (onSuccess) {
-      redux ? await dispatch(onSuccess(data)) : onSuccess(data);
-    }
-  } catch (err) {
-    const { url, status } = err;
-
-    if (err.status === 401 && Cached.refreshToken && !url.includes('/logout')) {
-      if (refresh === null) {
-        try {
-          refresh = refreshToken(Cached.refreshToken);
-          await refresh;
-          refresh = null;
-          return apiRequest(config);
-        } catch (e) {
-          refresh = null;
-          await dispatch(reset());
-        }
+      if (!result.ok) {
+        throw result;
       }
 
-      await refresh;
-      return apiRequest(config);
+      const data = await parseJSON(result);
+
+      onSuccess && (await dispatch(onSuccess(data)));
+    } catch (err) {
+      const { url, status } = err;
+
+      if (
+        status === 401 &&
+        !refreshExceptions.some(item => url.includes(item)) &&
+        refreshFnc
+      ) {
+        if (refresh === null) {
+          try {
+            refresh = refreshFnc(getState());
+            await refresh;
+            refresh = null;
+            await apiRequest(requestConfig);
+          } catch (e) {
+            refresh = null;
+          }
+          return;
+        }
+
+        await refresh;
+        await apiRequest(requestConfig);
+        return;
+      }
+      errorCodes.includes(status) && onErrorFnc(store);
+
+      onError && (await dispatch(onError(err)));
     }
-    errorCodes.includes(status) &&
-      (await dispatch(addNotification({ type: 'error', code: status })));
-    if (onError) {
-      redux ? await dispatch(onError(err)) : onError(err);
-    }
-  }
+  };
 };

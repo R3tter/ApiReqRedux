@@ -14,12 +14,8 @@ export const parseJSON = response => {
     .then(text => (checkJSON(text) ? JSON.parse(text) : text ? text : {}));
 };
 
-export const getHeaders = additionalHeaders => {
-  const headers = new Headers([
-    ['Content-Type', 'application/json'],
-    ['x-language', store.getState().Cached.language],
-    ['session', store.getState().Cached.authToken]
-  ]);
+export const getHeaders = (headers, additionalHeaders) => {
+  const headers = new Headers(headers);
   if (additionalHeaders) {
     additionalHeaders.forEach(addHeader => {
       headers.set(addHeader.name, addHeader.value);
@@ -28,3 +24,33 @@ export const getHeaders = additionalHeaders => {
 
   return headers;
 };
+
+
+
+//////////////////////////
+// refreshToken example
+/*
+
+import { createAction } from 'redux-actions';
+import { apiRequest } from 'core/apiRequest';
+
+export const reset = createAction('RESET', state => state);
+export const setCachedData = createAction('SET_CACHED_DATA', state => state);
+
+export const refreshToken = refreshToken =>
+    new Promise(resolve =>
+        apiRequest({
+          url: '/api/refresh',
+          method: 'POST',
+          body: {
+            refreshToken
+          },
+          redux: true,
+          onSuccess: ({ authToken }) => {
+            resolve();
+            return setCachedData({ authToken });
+          }
+        })
+    );
+
+ */
