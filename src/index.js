@@ -1,11 +1,8 @@
-import { refreshToken, reset, setCachedData } from 'App/actions';
 import { parseJSON, getHeaders } from './utils';
-import { addNotification } from 'Notification/actions';
-import store from 'store';
 
 const defaultErrorCodes = [400, 403, 404, 405, 408, 500, 501, 502, 503, 504];
 
-const defaultHeaders = [[['Content-Type', 'application/json']]];
+const defaultHeaders = () => [['Content-Type', 'application/json']];
 
 const defaultRefreshExceptions = ['logout', 'auth'];
 
@@ -17,33 +14,35 @@ export const apiRequestRedux = config => {
     refreshExceptions = defaultRefreshExceptions,
     headers = defaultHeaders,
     errorCodes = defaultErrorCodes,
+    defaultCredentials = 'same-origin',
     onErrorFnc
   } = config;
 
-  return async requestConfig => {
+  const apiRequest = async requestConfig => {
     const {
       url,
       method = 'GET',
       body,
-      additionalHeaders,
+      additionalHeaders = () => null,
       onStart,
       onError,
       onSuccess,
-      selector
+      selector,
+      credentials = defaultCredentials,
+      useDefaultErrorHandler = true,
     } = requestConfig;
-    const { getState, dispatch } = store;
-    const isGet = method === 'GET';
+    const { getState, dispatch } = store();;
     try {
       onStart && (await dispatch(onStart()));
 
-      const payload = !isGet
+      const payload = body || selector
         ? JSON.stringify(body || (selector && selector(getState())) || {})
         : null;
 
       const result = await fetch(url, {
         method,
-        credentials: 'same-origin',
-        headers: getHeaders(headers, additionalHeaders),
+        credentials,
+        headers: getHeaders(headers(getState()), additionalHeaders(getState())),
         body: payload
       });
 
@@ -54,6 +53,7 @@ export const apiRequestRedux = config => {
       const data = await parseJSON(result);
 
       onSuccess && (await dispatch(onSuccess(data)));
+      return Promise.resolve(data);
     } catch (err) {
       const { url, status } = err;
 
@@ -77,10 +77,12 @@ export const apiRequestRedux = config => {
         await refresh;
         await apiRequest(requestConfig);
         return;
-      }
-      errorCodes.includes(status) && onErrorFnc(store);
+      } 
+      errorCodes.includes(status) && useDefaultErrorHandler && onErrorFnc(store());
 
       onError && (await dispatch(onError(err)));
+      Promise.reject(err);
     }
   };
+  return apiRequest;
 };

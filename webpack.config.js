@@ -4,8 +4,8 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'apireq.js',
-    library: 'apireq',
+    filename: 'index.js',
+    library: 'api-request-redux',
     libraryTarget: 'umd'
   }
 };

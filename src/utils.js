@@ -15,14 +15,13 @@ export const parseJSON = response => {
 };
 
 export const getHeaders = (headers, additionalHeaders) => {
-  const headers = new Headers(headers);
+  const newHeaders = new Headers(headers);
   if (additionalHeaders) {
     additionalHeaders.forEach(addHeader => {
-      headers.set(addHeader.name, addHeader.value);
+      newHeaders.set(addHeader.name, addHeader.value);
     });
   }
-
-  return headers;
+  return newHeaders;
 };
 
 
