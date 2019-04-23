@@ -15,7 +15,8 @@ export const apiRequestRedux = config => {
     headers = defaultHeaders,
     errorCodes = defaultErrorCodes,
     defaultCredentials = 'same-origin',
-    onErrorFnc
+    onErrorFnc,
+    reset
   } = config;
 
   const apiRequest = async requestConfig => {
@@ -70,6 +71,7 @@ export const apiRequestRedux = config => {
             await apiRequest(requestConfig);
           } catch (e) {
             refresh = null;
+            dispatch(reset());
           }
           return;
         }

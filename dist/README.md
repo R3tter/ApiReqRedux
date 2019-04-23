@@ -51,6 +51,7 @@ Than use apiRequest to create request:
       defaultCredentials = 'same-origin',
       ```
      - onErrorFnc - will be called when errorCodes.includes(fetch.status)
+     - reset - will be called if refresh token failed
  -  apiRequest
     - url - request endpoint
     - method - request method (GET, POST, PUT, etc..)
