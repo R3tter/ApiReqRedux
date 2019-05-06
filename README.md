@@ -3,7 +3,7 @@ ApiRequestRedux works only with redux.
 #####Install
 ```$ npm i api-request-redux```
 #####Usage
-```import { apiRequestRedux } from 'api-request-redux';```
+```import { apiRequestRedux } from 'api-req-redux';```
 
 apiRequestRedux takes global config.
 ``` 
