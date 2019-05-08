@@ -17,8 +17,8 @@ export const parseJSON = response => {
 export const getHeaders = (headers, additionalHeaders) => {
   const newHeaders = new Headers(headers);
   if (additionalHeaders) {
-    additionalHeaders.forEach(addHeader => {
-      newHeaders.set(addHeader.name, addHeader.value);
+    additionalHeaders.forEach(([name, value]) => {
+      newHeaders.set(name, value);
     });
   }
   return newHeaders;
