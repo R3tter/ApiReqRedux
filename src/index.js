@@ -31,19 +31,23 @@ export const apiRequestRedux = config => {
       selector,
       credentials = defaultCredentials,
       useDefaultErrorHandler = true,
+      removeHeaders,
+      bodyParser
     } = requestConfig;
-    const { getState, dispatch } = store();;
+    const { getState, dispatch } = store();
     try {
       onStart && (await dispatch(onStart()));
 
       const payload = body || selector
-        ? JSON.stringify(body || (selector && selector(getState())) || {})
+        ? bodyParser ? bodyParser(body || selector(getState()) ) : JSON.stringify(body || (selector(getState())) || {})
         : null;
+      const finalHeaders = getHeaders(headers(getState()), additionalHeaders(getState()));
+      removeHeaders && removeHeaders.forEach(item => finalHeaders.delete(item));
 
       const result = await fetch(url, {
         method,
         credentials,
-        headers: getHeaders(headers(getState()), additionalHeaders(getState())),
+        headers: finalHeaders,
         body: payload
       });
 
