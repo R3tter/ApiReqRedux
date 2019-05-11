@@ -1,0 +1,30 @@
+version: 2
+jobs: 
+  build:
+    docker:
+      - image: circleci/node:11.0.0
+    steps: 
+      - checkout
+      - run: npm i
+      - run: npm run build
+  publish:
+    docker:
+      - image: circleci/node:11.0.0
+    steps: 
+      - checkout
+      - run: cd dist
+      - run: npm publish
+workflows:
+  version: 2
+  build_and_publish:
+    jobs:
+      - build:
+         filters:
+            branches:
+              only:
+                - master
+      - publish:
+          filters:
+              branches:
+                only:
+                  - master  
