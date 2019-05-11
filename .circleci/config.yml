@@ -8,7 +8,11 @@ jobs:
       - run: npm i
       - run: npm run build
       - run: cd dist
-      - run: npm login --token 3b6d98e9-4647-430d-95f4-bc69ca66d9d0
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
       - run: npm publish
 workflows:
   version: 2
