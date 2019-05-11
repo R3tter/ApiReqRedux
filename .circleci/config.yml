@@ -7,10 +7,6 @@ jobs:
       - checkout
       - run: npm i
       - run: npm run build
-  publish:
-    docker:
-      - image: circleci/node:11.0.0
-    steps: 
       - run: cd dist
       - run: npm publish
 workflows:
@@ -21,11 +17,4 @@ workflows:
          filters:
             branches:
               only:
-                - master
-      - publish:
-          requires:
-            - build
-          filters:
-              branches:
-                only:
-                  - master  
+                - master  
