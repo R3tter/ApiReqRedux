@@ -8,8 +8,7 @@ jobs:
       - run: npm i
       - run: npm run build
       - run: cd dist
-      - run: npm login
-      - run: r3tter 
+      - run: npm login && r3tter
       - run: npm publish
 workflows:
   version: 2
