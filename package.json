@@ -1,6 +1,6 @@
 {
   "name": "api-req-redux",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "api request lib",
   "main": "index.js",
   "scripts": {
