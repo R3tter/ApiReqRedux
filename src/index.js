@@ -69,7 +69,7 @@ export const apiRequestRedux = config => {
       ) {
         if (refresh === null) {
           try {
-            refresh = refreshFnc(getState());
+            refresh = refreshFnc(store());
             await refresh;
             refresh = null;
             await apiRequest(requestConfig);
