@@ -24,32 +24,7 @@ export const getHeaders = (headers, additionalHeaders) => {
   return newHeaders;
 };
 
-
-
-//////////////////////////
-// refreshToken example
-/*
-
-import { createAction } from 'redux-actions';
-import { apiRequest } from 'core/apiRequest';
-
-export const reset = createAction('RESET', state => state);
-export const setCachedData = createAction('SET_CACHED_DATA', state => state);
-
-export const refreshToken = refreshToken =>
-    new Promise(resolve =>
-        apiRequest({
-          url: '/api/refresh',
-          method: 'POST',
-          body: {
-            refreshToken
-          },
-          redux: true,
-          onSuccess: ({ authToken }) => {
-            resolve();
-            return setCachedData({ authToken });
-          }
-        })
-    );
-
- */
+export const getPayload = (input, bodyParser) => {
+  if (!input) return null;
+  bodyParser ? bodyParser(input) : JSON.stringify(input);
+};

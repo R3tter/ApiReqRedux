@@ -1,4 +1,4 @@
-import { parseJSON, getHeaders } from './utils';
+import { parseJSON, getHeaders, getPayload } from './utils';
 
 const defaultErrorCodes = [400, 403, 404, 405, 408, 500, 501, 502, 503, 504];
 
@@ -38,9 +38,7 @@ export const apiRequestRedux = config => {
     try {
       onStart && (await dispatch(onStart()));
 
-      const payload = body || selector
-        ? bodyParser ? bodyParser(body || selector(getState()) ) : JSON.stringify(body || (selector(getState())) || {})
-        : null;
+      const payload = getPayload(body || selector(getState()), bodyParser);
       const finalHeaders = getHeaders(headers(getState()), additionalHeaders(getState()));
       removeHeaders && removeHeaders.forEach(item => finalHeaders.delete(item));
 
@@ -83,7 +81,7 @@ export const apiRequestRedux = config => {
         await refresh;
         await apiRequest(requestConfig);
         return;
-      } 
+      }
       errorCodes.includes(status) && useDefaultErrorHandler && onErrorFnc(store(), err);
 
       onError && (await dispatch(onError(await parseJSON(err))));
