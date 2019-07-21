@@ -10,6 +10,7 @@ export const apiRequestRedux = config => {
   let refresh = null;
   const {
     store,
+    baseUrl,
     refreshFnc,
     refreshExceptions = defaultRefreshExceptions,
     headers = defaultHeaders,
@@ -42,7 +43,7 @@ export const apiRequestRedux = config => {
       const finalHeaders = getHeaders(headers(getState()), additionalHeaders(getState()));
       removeHeaders && removeHeaders.forEach(item => finalHeaders.delete(item));
 
-      const result = await fetch(url, {
+      const result = await fetch(baseUrl + url, {
         method,
         credentials,
         headers: finalHeaders,
