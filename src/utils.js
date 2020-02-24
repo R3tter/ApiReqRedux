@@ -26,5 +26,5 @@ export const getHeaders = (headers, additionalHeaders) => {
 
 export const getPayload = (input, bodyParser) => {
   if (!input) return null;
-  bodyParser ? bodyParser(input) : JSON.stringify(input);
+  return bodyParser ? bodyParser(input) : JSON.stringify(input);
 };
