@@ -1,8 +1,8 @@
-name: Publish to NPM
+name: Node.js Package 2
 
 on:
   push:
-    branches: 
+    branches:
       - master
 
 jobs:
@@ -15,7 +15,17 @@ jobs:
           node-version: 12
       - run: npm ci
       - run: npm run build
-      - run: cd ./dist  
-      - run: npm publish --access public
-        env:
-           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: cd ./dist
+      - name: NPM Publish
+        uses: JS-DevTools/npm-publish@v1
