@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: 12
       - run: npm ci
-      - run: npm build
+      - run: npm run build
       - run: ls
       - run: cd ./dist  
       - run: npm publish
