@@ -16,9 +16,8 @@ jobs:
           registry-url: https://registry.npmjs.org/ 
       - run: npm ci
       - run: npm run build
-      - name: NPM Publish
-        uses: JS-DevTools/npm-publish@v1
-        with: 
-          token: ${{secrets.npm_token}}
-          package: ./dist/package.json
+      - uses: primer/publish@master
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.npm_token }}
+          args: "--dir=./dist/"
       
