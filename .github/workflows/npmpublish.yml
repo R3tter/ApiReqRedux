@@ -16,11 +16,7 @@ jobs:
           registry-url: https://registry.npmjs.org/ 
       - run: npm ci
       - run: npm run build
-
-  publish-npm:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - run: cd ./dist
       - name: NPM Publish
         uses: JS-DevTools/npm-publish@v1
+      
