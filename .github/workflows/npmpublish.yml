@@ -16,8 +16,12 @@ jobs:
           registry-url: https://registry.npmjs.org/ 
       - run: npm ci
       - run: npm run build
-      - uses: primer/publish@master
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.npm_token }}
-          args: "--dir=./dist/"
+      - run: cd ./dist
+      - name: npm publish
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+          npm publish
+        env: 
+         CI: true
+         NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }} 
       
