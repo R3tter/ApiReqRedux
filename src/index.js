@@ -10,13 +10,13 @@ export const apiRequestRedux = config => {
   let refresh = null;
   const {
     store,
-    baseUrl,
+    baseUrl = "",
     refreshFnc,
     refreshExceptions = defaultRefreshExceptions,
     headers = defaultHeaders,
     errorCodes = defaultErrorCodes,
     defaultCredentials = 'same-origin',
-    onErrorFnc,
+    onErrorFnc = () => null,
     reset
   } = config;
 
@@ -29,7 +29,7 @@ export const apiRequestRedux = config => {
       onStart,
       onError,
       onSuccess,
-      selector,
+      selector = () => null,
       credentials = defaultCredentials,
       useDefaultErrorHandler = true,
       removeHeaders,
