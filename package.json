@@ -1,11 +1,11 @@
 {
   "name": "api-req-redux",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "api request lib",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rimraf ./dist && webpack --mode production --config ./webpack.config.js && cp package.json dist/ && cp README.md dist/"
+    "build": "rimraf ./dist && webpack --mode development --config ./webpack.config.js && cp package.json dist/ && cp README.md dist/"
   },
   "repository": {
     "type": "git",
