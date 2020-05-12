@@ -1,10 +1,10 @@
-import { parseJSON, getHeaders, getPayload } from './utils';
+import { parseJSON, getHeaders, getPayload } from "./utils";
 
 const defaultErrorCodes = [400, 403, 404, 405, 408, 500, 501, 502, 503, 504];
 
-const defaultHeaders = () => [['Content-Type', 'application/json']];
+const defaultHeaders = () => [["Content-Type", "application/json"]];
 
-const defaultRefreshExceptions = ['logout', 'auth'];
+const defaultRefreshExceptions = ["logout", "auth"];
 
 export const apiRequestRedux = config => {
   let refresh = null;
@@ -15,7 +15,7 @@ export const apiRequestRedux = config => {
     refreshExceptions = defaultRefreshExceptions,
     headers = defaultHeaders,
     errorCodes = defaultErrorCodes,
-    defaultCredentials = 'same-origin',
+    defaultCredentials = "same-origin",
     onErrorFnc = () => null,
     reset
   } = config;
@@ -23,7 +23,7 @@ export const apiRequestRedux = config => {
   const apiRequest = async requestConfig => {
     const {
       url,
-      method = 'GET',
+      method = "GET",
       body,
       additionalHeaders = () => null,
       onStart,
@@ -40,7 +40,10 @@ export const apiRequestRedux = config => {
       onStart && (await dispatch(onStart()));
 
       const payload = getPayload(body || selector(getState()), bodyParser);
-      const finalHeaders = getHeaders(headers(getState()), additionalHeaders(getState()));
+      const finalHeaders = getHeaders(
+        headers(getState()),
+        additionalHeaders(getState())
+      );
       removeHeaders && removeHeaders.forEach(item => finalHeaders.delete(item));
 
       const result = await fetch(baseUrl + url, {
@@ -83,7 +86,9 @@ export const apiRequestRedux = config => {
         await apiRequest(requestConfig);
         return;
       }
-      errorCodes.includes(status) && useDefaultErrorHandler && onErrorFnc(store(), err);
+      errorCodes.includes(status) &&
+        useDefaultErrorHandler &&
+        onErrorFnc(store(), err);
 
       onError && (await dispatch(onError(await parseJSON(err))));
       Promise.reject(err);

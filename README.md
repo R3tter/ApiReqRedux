@@ -56,7 +56,7 @@ Than use apiRequest to create request:
     - url - request endpoint
     - method - request method (GET, POST, PUT, etc..)
     - body - object with data you want to send with request (also you can selector)
-    - additionalHeaders - additional headers for this request
+    - additionalHeaders - additional headers for this request. Function similar to headers
     - onStart - functions that called before fetch, you can use it to change redux store before make request
     - onError - functions that called when fetch fail, you can use it to change redux store, and perform error handling. Takes error as parameter
     - onSuccess - functions that called when fetch successed, you can use it to change redux store, and perform success handleing. Takes data as parameter
