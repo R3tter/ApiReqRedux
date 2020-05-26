@@ -1,6 +1,6 @@
 # ApiRequestRedux
 ApiRequestRedux works only with redux.
-#####Install
+##Install
 ```$ npm i api-request-redux```
 #####Usage
 ```import { apiRequestRedux } from 'api-req-redux';```
