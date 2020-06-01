@@ -6,7 +6,7 @@ const defaultHeaders = () => [["Content-Type", "application/json"]];
 
 const defaultRefreshExceptions = ["logout", "auth"];
 
-export const apiRequestRedux = config => {
+export const apiRequestRedux = (config) => {
   let refresh = null;
   const {
     store,
@@ -17,10 +17,10 @@ export const apiRequestRedux = config => {
     errorCodes = defaultErrorCodes,
     defaultCredentials = "same-origin",
     onErrorFnc = () => null,
-    reset
+    reset,
   } = config;
 
-  const apiRequest = async requestConfig => {
+  const apiRequest = async (requestConfig) => {
     const {
       url,
       method = "GET",
@@ -33,7 +33,7 @@ export const apiRequestRedux = config => {
       credentials = defaultCredentials,
       useDefaultErrorHandler = true,
       removeHeaders,
-      bodyParser
+      bodyParser,
     } = requestConfig;
     const { getState, dispatch } = store();
     try {
@@ -44,13 +44,14 @@ export const apiRequestRedux = config => {
         headers(getState()),
         additionalHeaders(getState())
       );
-      removeHeaders && removeHeaders.forEach(item => finalHeaders.delete(item));
+      removeHeaders &&
+        removeHeaders.forEach((item) => finalHeaders.delete(item));
 
       const result = await fetch(baseUrl + url, {
         method,
         credentials,
         headers: finalHeaders,
-        body: payload
+        body: payload,
       });
 
       if (!result.ok) {
@@ -66,7 +67,7 @@ export const apiRequestRedux = config => {
 
       if (
         status === 401 &&
-        !refreshExceptions.some(item => url.includes(item)) &&
+        !refreshExceptions.some((item) => url.includes(item)) &&
         refreshFnc
       ) {
         if (refresh === null) {

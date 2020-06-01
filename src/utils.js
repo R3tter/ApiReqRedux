@@ -1,4 +1,4 @@
-export const checkJSON = data => {
+export const checkJSON = (data) => {
   try {
     JSON.parse(data);
   } catch {
@@ -8,10 +8,10 @@ export const checkJSON = data => {
   return true;
 };
 
-export const parseJSON = response => {
+export const parseJSON = (response) => {
   return response
     .text()
-    .then(text => (checkJSON(text) ? JSON.parse(text) : text ? text : {}));
+    .then((text) => (checkJSON(text) ? JSON.parse(text) : text ? text : {}));
 };
 
 export const getHeaders = (headers, additionalHeaders) => {
