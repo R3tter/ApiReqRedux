@@ -9,9 +9,13 @@ export const checkJSON = (data) => {
 };
 
 export const parseJSON = (response) => {
-  return response
-    .text()
-    .then((text) => (checkJSON(text) ? JSON.parse(text) : text ? text : {}));
+  try {
+    return response
+        .text()
+        .then((text) => (checkJSON(text) ? JSON.parse(text) : text ? text : {}));
+  } catch {
+    return response;
+  }
 };
 
 export const getHeaders = (headers, additionalHeaders) => {
