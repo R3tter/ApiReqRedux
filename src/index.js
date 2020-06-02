@@ -6,7 +6,7 @@ const defaultHeaders = () => [["Content-Type", "application/json"]];
 
 const defaultRefreshExceptions = ["logout", "auth"];
 
-export const apiRequestRedux = config => {
+export const apiRequestRedux = (config) => {
   let refresh = null;
   const {
     store,
@@ -17,10 +17,10 @@ export const apiRequestRedux = config => {
     errorCodes = defaultErrorCodes,
     defaultCredentials = "same-origin",
     onErrorFnc = () => null,
-    reset
+    reset,
   } = config;
 
-  const apiRequest = async requestConfig => {
+  const apiRequest = async (requestConfig) => {
     const {
       url,
       method = "GET",
@@ -33,24 +33,25 @@ export const apiRequestRedux = config => {
       credentials = defaultCredentials,
       useDefaultErrorHandler = true,
       removeHeaders,
-      bodyParser
+      bodyParser,
     } = requestConfig;
-    const { getState, dispatch } = store();
+    const { getState } = store();
     try {
-      onStart && (await dispatch(onStart()));
+      onStart && (await onStart());
 
       const payload = getPayload(body || selector(getState()), bodyParser);
       const finalHeaders = getHeaders(
         headers(getState()),
         additionalHeaders(getState())
       );
-      removeHeaders && removeHeaders.forEach(item => finalHeaders.delete(item));
+      removeHeaders &&
+        removeHeaders.forEach((item) => finalHeaders.delete(item));
 
       const result = await fetch(baseUrl + url, {
         method,
         credentials,
         headers: finalHeaders,
-        body: payload
+        body: payload,
       });
 
       if (!result.ok) {
@@ -59,14 +60,14 @@ export const apiRequestRedux = config => {
 
       const data = await parseJSON(result);
 
-      onSuccess && (await dispatch(onSuccess(data)));
+      onSuccess && (await onSuccess(data));
       return Promise.resolve(data);
     } catch (err) {
       const { url, status } = err;
 
       if (
         status === 401 &&
-        !refreshExceptions.some(item => url.includes(item)) &&
+        !refreshExceptions.some((item) => url.includes(item)) &&
         refreshFnc
       ) {
         if (refresh === null) {
@@ -77,7 +78,7 @@ export const apiRequestRedux = config => {
             await apiRequest(requestConfig);
           } catch (e) {
             refresh = null;
-            dispatch(reset());
+            reset();
           }
           return;
         }
@@ -89,8 +90,7 @@ export const apiRequestRedux = config => {
       errorCodes.includes(status) &&
         useDefaultErrorHandler &&
         onErrorFnc(store(), err);
-
-      onError && (await dispatch(onError(await parseJSON(err))));
+      onError && (await onError(await parseJSON(err)));
       Promise.reject(err);
     }
   };
