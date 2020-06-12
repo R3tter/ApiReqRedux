@@ -11,8 +11,8 @@ export const checkJSON = (data) => {
 export const parseJSON = (response) => {
   try {
     return response
-        .text()
-        .then((text) => (checkJSON(text) ? JSON.parse(text) : text ? text : {}));
+      .text()
+      .then((text) => (checkJSON(text) ? JSON.parse(text) : text ? text : {}));
   } catch {
     return response;
   }

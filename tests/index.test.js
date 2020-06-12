@@ -1,8 +1,8 @@
 import { apiRequestRedux } from "../src";
-require('jest-fetch-mock').enableMocks();
+require("jest-fetch-mock").enableMocks();
 
 const store = () => ({
-  getState: () => ({ key: 'value' })
+  getState: () => ({ key: "value" }),
 });
 
 beforeEach(() => {
@@ -16,83 +16,92 @@ afterEach(() => {
 describe("apiRequestRedux", () => {
   const reset = jest.fn();
   const onErrorFnc = jest.fn();
-  const refreshFnc = jest.fn(() => new Promise((resolve, reject) => setTimeout(() => resolve('some'), 2000)));
+  const refreshFnc = jest.fn(
+    () =>
+      new Promise((resolve, reject) => setTimeout(() => resolve("some"), 2000))
+  );
   const apiRequest = apiRequestRedux({
     store,
-    baseUrl: '/api',
+    baseUrl: "/api",
     onErrorFnc,
     refreshFnc,
-    reset
+    reset,
   });
 
-  it('url contains base url', async () => {
+  it("url contains base url", async () => {
     await fetchMock.mockResponseOnce((req) => {
-      expect(req.url).toBe('/api/someUrl');
-      return Promise.resolve().then(res => ({ body: 'ok' }));
+      expect(req.url).toBe("/api/someUrl");
+      return Promise.resolve().then((res) => ({ body: "ok" }));
     });
-    await apiRequest({ url: '/someUrl' });
+    await apiRequest({ url: "/someUrl" });
   });
-  it('onStart function works', async () => {
-    await fetchMock.mockResponseOnce('');
+  it("onStart function works", async () => {
+    await fetchMock.mockResponseOnce("");
     const onStart = jest.fn();
-    await apiRequest({ url: 'someUrl', onStart});
+    await apiRequest({ url: "someUrl", onStart });
     expect(onStart).toBeCalledTimes(1);
-    await apiRequest({ url: 'someUrl', onStart});
+    await apiRequest({ url: "someUrl", onStart });
     expect(onStart).toBeCalledTimes(2);
   });
 
   it("onSuccess function works as expected", async () => {
     const response = "response";
     await fetchMock.mockResponseOnce(JSON.stringify(response));
-    await apiRequest({ url: 'someUrl', onSuccess: data => expect(data).toBe(response) });
+    await apiRequest({
+      url: "someUrl",
+      onSuccess: (data) => expect(data).toBe(response),
+    });
   });
 
-  it('reset should be called if refresh was unsuccessful', async () => {
+  it("reset should be called if refresh was unsuccessful", async () => {
     const reset = jest.fn();
-    const refreshFnc = jest.fn(() => new Promise((resolve, reject) => setTimeout(() => reject('some'), 2000)));
+    const refreshFnc = jest.fn(
+      () =>
+        new Promise((resolve, reject) => setTimeout(() => reject("some"), 2000))
+    );
     const apiRequest1 = apiRequestRedux({
       store,
-      baseUrl: '/api',
+      baseUrl: "/api",
       refreshFnc,
-      reset
+      reset,
     });
-    await fetchMock.mockResponseOnce('', { status: 401 });
+    await fetchMock.mockResponseOnce("", { status: 401 });
     const onStart = jest.fn();
-    await apiRequest1({ url: 'someUrl', onStart});
+    await apiRequest1({ url: "someUrl", onStart });
     expect(onStart).toBeCalledTimes(1);
     expect(refreshFnc).toBeCalledTimes(1);
     expect(reset).toBeCalledTimes(1);
-  })
+  });
 
-  it('refreshFnc should be called if status - 401', async () => {
-    await fetchMock.mockResponseOnce('', { status: 401 });
+  it("refreshFnc should be called if status - 401", async () => {
+    await fetchMock.mockResponseOnce("", { status: 401 });
     const onStart = jest.fn();
-    await apiRequest({ url: 'someUrl', onStart});
+    await apiRequest({ url: "someUrl", onStart });
     expect(onStart).toBeCalledTimes(2);
     expect(refreshFnc).toBeCalledTimes(1);
   });
 
-  it('apiRequest can handle fetch error', async () => {
-    const error = 'some err 1';
+  it("apiRequest can handle fetch error", async () => {
+    const error = "some err 1";
     fetchMock.mockRejectOnce(error);
-    const onError = jest.fn(err => expect(err).toBe(error));
-    await apiRequest({ url: 'someUrl', onError});
+    const onError = jest.fn((err) => expect(err).toBe(error));
+    await apiRequest({ url: "someUrl", onError });
   });
 
-  it('global onErrorFnc should be called', async () => {
-    const error = 'some err 2';
+  it("global onErrorFnc should be called", async () => {
+    const error = "some err 2";
     fetchMock.mockResponseOnce(JSON.stringify(error), { status: 500 });
     const onStart = jest.fn();
-    await apiRequest({ url: 'someUrl', onStart});
+    await apiRequest({ url: "someUrl", onStart });
     expect(onErrorFnc).toBeCalledTimes(1);
   });
 
-  it('apiRequest can handle error statuses', async () => {
-    const error = 'some err 3';
+  it("apiRequest can handle error statuses", async () => {
+    const error = "some err 3";
     fetchMock.mockResponseOnce(JSON.stringify(error), { status: 500 });
-    const onError = jest.fn(err => expect(err).toBe(error));
+    const onError = jest.fn((err) => expect(err).toBe(error));
     const onSuccess = jest.fn();
-    await apiRequest({ url: 'someUrl', onError, onSuccess});
+    await apiRequest({ url: "someUrl", onError, onSuccess });
     expect(onSuccess).toBeCalledTimes(0);
     expect(onError).toBeCalledTimes(1);
   });
