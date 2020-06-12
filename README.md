@@ -23,9 +23,9 @@ Than use apiRequest to create request:
         url: '/api/login',
         body: data,
         method: 'POST',
-        onStart: () => dispatch(({ type: 'login/start' })),
-        onSuccess: data => dispatch(({ type: 'login/success', payload: data })),
-        onError: err => dispatch(({ type: 'login/error', payload: err }))
+        onStart: (dispatch) => dispatch(({ type: 'login/start' })),
+        onSuccess: (data, dispatch) => dispatch(({ type: 'login/success', payload: data })),
+        onError: (err, dispatch) => dispatch(({ type: 'login/error', payload: err }))
       });
     };
  ```

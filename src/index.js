@@ -35,9 +35,9 @@ export const apiRequestRedux = (config) => {
       removeHeaders,
       bodyParser,
     } = requestConfig;
-    const { getState } = store();
+    const { getState, dispatch } = store();
     try {
-      onStart && (await onStart());
+      onStart && (await onStart(dispatch));
 
       const payload = getPayload(body || selector(getState()), bodyParser);
       const finalHeaders = getHeaders(
@@ -60,7 +60,7 @@ export const apiRequestRedux = (config) => {
 
       const data = await parseJSON(result);
 
-      onSuccess && (await onSuccess(data));
+      onSuccess && (await onSuccess(data, dispatch));
       return Promise.resolve(data);
     } catch (err) {
       const { url, status } = err;
@@ -90,7 +90,7 @@ export const apiRequestRedux = (config) => {
       errorCodes.includes(status) &&
         useDefaultErrorHandler &&
         onErrorFnc(store(), err);
-      onError && (await onError(await parseJSON(err)));
+      onError && (await onError(await parseJSON(err), dispatch));
       Promise.reject(err);
     }
   };
