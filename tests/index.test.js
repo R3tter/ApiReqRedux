@@ -52,15 +52,18 @@ describe("apiRequestRedux", () => {
     const error = "some err 1";
     fetchMock.mockRejectOnce(error);
     const onError = jest.fn((err) => expect(err).toBe(error));
-    await apiRequest({ url: "someUrl", onError });
+    apiRequest({ url: "someUrl", onError });
   });
 
   it("global onErrorFnc should be called", async () => {
     const error = "some err 2";
     fetchMock.mockResponseOnce(JSON.stringify(error), { status: 500 });
     const onStart = jest.fn();
-    await apiRequest({ url: "someUrl", onStart });
-    expect(onErrorFnc).toBeCalledTimes(1);
+    try {
+      await apiRequest({ url: "someUrl", onStart });
+    } catch (e) {
+      expect(onErrorFnc).toBeCalledTimes(1);
+    }
   });
 
   it("apiRequest can handle error statuses", async () => {
@@ -68,8 +71,11 @@ describe("apiRequestRedux", () => {
     fetchMock.mockResponseOnce(JSON.stringify(error), { status: 500 });
     const onError = jest.fn((err) => expect(err).toBe(error));
     const onSuccess = jest.fn();
-    await apiRequest({ url: "someUrl", onError, onSuccess });
-    expect(onSuccess).toBeCalledTimes(0);
-    expect(onError).toBeCalledTimes(1);
+    try {
+      await apiRequest({ url: "someUrl", onError, onSuccess });
+    } catch (e) {
+      expect(onSuccess).toBeCalledTimes(0);
+      expect(onError).toBeCalledTimes(1);
+    }
   });
 });
