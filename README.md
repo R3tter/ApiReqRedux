@@ -33,12 +33,7 @@ Than use apiRequest to create request:
  - apiRequestRedux
     
     - store - function that returns redux store
-    - refreshFnc - executes when fetch failed with code 401
-    - refreshExceptions - array of url, default:
-      ```
-      const defaultRefreshExceptions = ['logout', 'auth'];
-      ```
-      So when your request url contains `logout` or `auth` refreshFnc won't call
+    - refreshConfig - takes the same parameters as apiRequest
     - headers - function that take current state and return array entries like this:
        ```
        const getHeaders = state => [
@@ -69,7 +64,9 @@ Than use apiRequest to create request:
       ```
       ['content-type']
       ```    
-    - bodyParser - using this function you can replace default ```JSON.stringify(body)``` and modify body as you want 
+    - bodyParser - using this function you can replace default ```JSON.stringify(body)``` and modify body as you want
+    - isRefresh - boolean, in case you don't want to 
+    call refresh token on this request (default: true)
       
     
 

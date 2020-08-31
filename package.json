@@ -1,6 +1,6 @@
 {
   "name": "api-req-redux",
-  "version": "1.0.26",
+  "version": "2.0.0",
   "description": "api request lib",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,13 @@
       "js"
     ]
   },
+  "keywords": [
+    "api-request-redux",
+    "react-fetch",
+    "redux-fetch",
+    "api-fetch",
+    "request-redux"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {

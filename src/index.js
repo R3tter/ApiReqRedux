@@ -4,15 +4,12 @@ const defaultErrorCodes = [400, 403, 404, 405, 408, 500, 501, 502, 503, 504];
 
 const defaultHeaders = () => [["Content-Type", "application/json"]];
 
-const defaultRefreshExceptions = ["logout", "auth"];
-
 export const apiRequestRedux = (config) => {
   let refresh = null;
   const {
     store,
     baseUrl = "",
-    refreshFnc,
-    refreshExceptions = defaultRefreshExceptions,
+    refreshConfig,
     headers = defaultHeaders,
     errorCodes = defaultErrorCodes,
     defaultCredentials = "same-origin",
@@ -34,6 +31,7 @@ export const apiRequestRedux = (config) => {
       useDefaultErrorHandler = true,
       removeHeaders,
       bodyParser,
+      isRefresh = true
     } = requestConfig;
     const { getState, dispatch } = store();
     try {
@@ -63,16 +61,13 @@ export const apiRequestRedux = (config) => {
       onSuccess && (await onSuccess(data, dispatch));
       return Promise.resolve(data);
     } catch (err) {
-      const { url, status } = err;
-
+      const { status } = err;
       if (
-        status === 401 &&
-        !refreshExceptions.some((item) => url.includes(item)) &&
-        refreshFnc
+        status === 401 && isRefresh && refreshConfig
       ) {
         if (refresh === null) {
           try {
-            refresh = refreshFnc(store());
+            refresh = apiRequest(refreshConfig);
             await refresh;
             refresh = null;
             await apiRequest(requestConfig);

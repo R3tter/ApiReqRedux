@@ -16,15 +16,10 @@ afterEach(() => {
 describe("apiRequestRedux", () => {
   const reset = jest.fn();
   const onErrorFnc = jest.fn();
-  const refreshFnc = jest.fn(
-    () =>
-      new Promise((resolve, reject) => setTimeout(() => resolve("some"), 2000))
-  );
   const apiRequest = apiRequestRedux({
     store,
     baseUrl: "/api",
     onErrorFnc,
-    refreshFnc,
     reset,
   });
 
@@ -51,34 +46,6 @@ describe("apiRequestRedux", () => {
       url: "someUrl",
       onSuccess: (data) => expect(data).toBe(response),
     });
-  });
-
-  it("reset should be called if refresh was unsuccessful", async () => {
-    const reset = jest.fn();
-    const refreshFnc = jest.fn(
-      () =>
-        new Promise((resolve, reject) => setTimeout(() => reject("some"), 2000))
-    );
-    const apiRequest1 = apiRequestRedux({
-      store,
-      baseUrl: "/api",
-      refreshFnc,
-      reset,
-    });
-    await fetchMock.mockResponseOnce("", { status: 401 });
-    const onStart = jest.fn();
-    await apiRequest1({ url: "someUrl", onStart });
-    expect(onStart).toBeCalledTimes(1);
-    expect(refreshFnc).toBeCalledTimes(1);
-    expect(reset).toBeCalledTimes(1);
-  });
-
-  it("refreshFnc should be called if status - 401", async () => {
-    await fetchMock.mockResponseOnce("", { status: 401 });
-    const onStart = jest.fn();
-    await apiRequest({ url: "someUrl", onStart });
-    expect(onStart).toBeCalledTimes(2);
-    expect(refreshFnc).toBeCalledTimes(1);
   });
 
   it("apiRequest can handle fetch error", async () => {
