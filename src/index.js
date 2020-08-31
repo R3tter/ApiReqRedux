@@ -86,7 +86,7 @@ export const apiRequestRedux = (config) => {
         useDefaultErrorHandler &&
         onErrorFnc(store(), err);
       onError && (await onError(await parseJSON(err), dispatch));
-      Promise.reject(err);
+      return Promise.reject(err);
     }
   };
   return apiRequest;
