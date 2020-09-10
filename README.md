@@ -12,7 +12,7 @@ ApiRequestRedux works only with redux.
       store: () => store,
       refreshFnc: state => ...your code, // function
       headers: state => [["Content-Type", "application/json"], ["token", state.userToken]]
-      onErrorFnc: handleError //function
+      onErrorFnc: (err, dispatch) => // your code
     });
 ```
 
