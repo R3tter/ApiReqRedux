@@ -33,14 +33,14 @@ export const apiRequestRedux = (config) => {
       bodyParser,
       isRefresh = true
     } = requestConfig;
-    const { getState, dispatch } = store();
+    const { getState, dispatch } = store?.() || {};
     try {
       onStart && (await onStart(dispatch));
 
       const payload = getPayload(body || selector(getState()), bodyParser);
       const finalHeaders = getHeaders(
-        headers(getState()),
-        additionalHeaders(getState())
+        headers(getState?.()),
+        additionalHeaders(getState?.())
       );
       removeHeaders &&
         removeHeaders.forEach((item) => finalHeaders.delete(item));

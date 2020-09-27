@@ -11,11 +11,6 @@
     "type": "git",
     "url": "https://github.com/R3tter/ApiReqRedux"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm test"
-    }
-  },
   "jest": {
     "transform": {
       "^.+\\.js$": "babel-jest"
