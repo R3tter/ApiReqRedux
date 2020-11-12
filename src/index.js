@@ -31,6 +31,7 @@ export const apiRequestRedux = (config) => {
       useDefaultErrorHandler = true,
       removeHeaders,
       bodyParser,
+      withoutBaseUrl = false,
       isRefresh = true
     } = requestConfig;
     const { getState, dispatch } = store ? store() : { getState: () => null, dispatch: () => null  };
@@ -45,7 +46,7 @@ export const apiRequestRedux = (config) => {
       removeHeaders &&
         removeHeaders.forEach((item) => finalHeaders.delete(item));
 
-      const result = await fetch(baseUrl + url, {
+      const result = await fetch(`${!withoutBaseUrl ? baseUrl : ''}${url}`, {
         method,
         credentials,
         headers: finalHeaders,

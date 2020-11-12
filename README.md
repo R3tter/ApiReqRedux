@@ -65,7 +65,8 @@ Than use apiRequest to create request:
       ['content-type']
       ```    
     - bodyParser - using this function you can replace default ```JSON.stringify(body)``` and modify body as you want
-    - isRefresh - boolean, in case you don't want to 
+    - isRefresh - boolean, in case you don't want to
+    - withoutBaseUrl - boolean 
     call refresh token on this request (default: true)
       
     
