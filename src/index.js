@@ -1,8 +1,10 @@
-import { parseJSON, getHeaders, getPayload } from "./utils";
+import { parseJSON, getHeaders, getPayload, createObserver} from "./utils";
 
 const defaultErrorCodes = [400, 403, 404, 405, 408, 500, 501, 502, 503, 504];
 
 const defaultHeaders = () => [["Content-Type", "application/json"]];
+
+const { subscribe, dispatch, unSubscribe } = createObserver()
 
 export const apiRequestRedux = (config) => {
   let refresh = null;
@@ -31,10 +33,16 @@ export const apiRequestRedux = (config) => {
       useDefaultErrorHandler = true,
       removeHeaders,
       bodyParser,
+      abortName,
       withoutBaseUrl = false,
       isRefresh = true
     } = requestConfig;
     const { getState, dispatch } = store ? store() : { getState: () => null, dispatch: () => null  };
+    const controller = new AbortController();
+    abortName && subscribe(abortName, () => {
+      controller.abort();
+      unSubscribe(abortName)
+    })
     try {
       onStart && (await onStart(dispatch));
 
@@ -51,6 +59,7 @@ export const apiRequestRedux = (config) => {
         credentials,
         headers: finalHeaders,
         body: payload,
+        signal: controller.signal
       });
 
       if (!result.ok) {
@@ -62,34 +71,38 @@ export const apiRequestRedux = (config) => {
       onSuccess && (await onSuccess(data, dispatch));
       return Promise.resolve(data);
     } catch (err) {
-      const { status } = err;
-      if (
-        status === 401 && isRefresh && refreshConfig
-      ) {
-        if (refresh === null) {
-          try {
-            refresh = apiRequest(refreshConfig);
-            await refresh;
-            refresh = null;
-            await apiRequest(requestConfig);
-          } catch (e) {
-            refresh = null;
-            reset();
+      const { status, name } = err;
+      if (name !== 'AbortError') {
+        if (
+          status === 401 && isRefresh && refreshConfig
+        ) {
+          if (refresh === null) {
+            try {
+              refresh = apiRequest(refreshConfig);
+              await refresh;
+              refresh = null;
+              await apiRequest(requestConfig);
+            } catch (e) {
+              refresh = null;
+              reset();
+            }
+            return;
           }
+
+          await refresh;
+          await apiRequest(requestConfig);
           return;
         }
-
-        await refresh;
-        await apiRequest(requestConfig);
-        return;
-      }
-      const errorParsed = await parseJSON(err);
-      errorCodes.includes(status) &&
-        useDefaultErrorHandler &&
-      (await onErrorFnc(errorParsed, dispatch));
-      onError && (await onError(errorParsed, dispatch));
+        const errorParsed = await parseJSON(err);
+        errorCodes.includes(status) &&
+          useDefaultErrorHandler &&
+        (await onErrorFnc(errorParsed, dispatch));
+        onError && (await onError(errorParsed, dispatch));
+        }
       return Promise.reject(err);
     }
   };
   return apiRequest;
 };
+
+export { dispatch as abortRequest };
