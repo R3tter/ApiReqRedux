@@ -105,4 +105,4 @@ export const apiRequestRedux = (config) => {
   return apiRequest;
 };
 
-export { dispatch as abortRequest };
+export const abortRequest = dispatch
