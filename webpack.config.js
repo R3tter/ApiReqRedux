@@ -7,5 +7,14 @@ module.exports = {
     filename: 'index.js',
     library: 'api-req-redux',
     libraryTarget: 'umd'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader'
+      }
+    ]
   }
 };
