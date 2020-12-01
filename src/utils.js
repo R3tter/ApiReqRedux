@@ -39,17 +39,23 @@ export const createObserver = () => {
   const subscribe = (key, callback) => {
     const prev = observers.get(key);
     observers.set(key, prev?.length ? [...prev, callback] : [callback]);
-  }
+  };
 
   const unSubscribe = (key) => {
-    observers.set(key, observers.get(key)?.filter((item, i) => i !== 0));
-  }
+    observers.set(
+      key,
+      observers.get(key)?.filter((item, i) => i !== 0)
+    );
+  };
 
-  const dispatch = (key, index) => observers.get(key)?.map((func, i) => index ? index === i && func() : func());
+  const dispatch = (key, index) =>
+    observers
+      .get(key)
+      ?.map((func, i) => (index ? index === i && func() : func()));
 
   return {
     subscribe,
     dispatch,
-    unSubscribe
+    unSubscribe,
   };
 };

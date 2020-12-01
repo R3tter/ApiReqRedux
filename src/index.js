@@ -1,28 +1,28 @@
-import { parseJSON, getHeaders, getPayload, createObserver} from "./utils";
+import { parseJSON, getHeaders, getPayload, createObserver } from './utils';
 
 const defaultErrorCodes = [400, 403, 404, 405, 408, 500, 501, 502, 503, 504];
 
-const defaultHeaders = () => [["Content-Type", "application/json"]];
+const defaultHeaders = () => [['Content-Type', 'application/json']];
 
-const { subscribe, dispatch, unSubscribe } = createObserver()
+const { subscribe, dispatch, unSubscribe } = createObserver();
 
-export const apiRequestRedux = (config) => {
+export const apiRequestRedux = config => {
   let refresh = null;
   const {
     store,
-    baseUrl = "",
+    baseUrl = '',
     refreshConfig,
     headers = defaultHeaders,
     errorCodes = defaultErrorCodes,
-    defaultCredentials = "same-origin",
+    defaultCredentials = 'same-origin',
     onErrorFnc = () => null,
-    reset,
+    reset
   } = config;
 
-  const apiRequest = async (requestConfig) => {
+  const apiRequest = async requestConfig => {
     const {
       url,
-      method = "GET",
+      method = 'GET',
       body,
       additionalHeaders = () => null,
       onStart,
@@ -37,22 +37,19 @@ export const apiRequestRedux = (config) => {
       withoutBaseUrl = false,
       isRefresh = true
     } = requestConfig;
-    const { getState, dispatch } = store ? store() : { getState: () => null, dispatch: () => null  };
+    const { getState, dispatch } = store ? store() : { getState: () => null, dispatch: () => null };
     const controller = new AbortController();
-    abortName && subscribe(abortName, () => {
-      controller.abort();
-      unSubscribe(abortName)
-    })
+    abortName &&
+      subscribe(abortName, () => {
+        controller.abort();
+        unSubscribe(abortName);
+      });
     try {
       onStart && (await onStart(dispatch));
 
       const payload = getPayload(body || selector(getState()), bodyParser);
-      const finalHeaders = getHeaders(
-        headers(getState()),
-        additionalHeaders(getState())
-      );
-      removeHeaders &&
-        removeHeaders.forEach((item) => finalHeaders.delete(item));
+      const finalHeaders = getHeaders(headers(getState()), additionalHeaders(getState()));
+      removeHeaders && removeHeaders.forEach(item => finalHeaders.delete(item));
 
       const result = await fetch(`${!withoutBaseUrl ? baseUrl : ''}${url}`, {
         method,
@@ -73,9 +70,7 @@ export const apiRequestRedux = (config) => {
     } catch (err) {
       const { status, name } = err;
       if (name !== 'AbortError') {
-        if (
-          status === 401 && isRefresh && refreshConfig
-        ) {
+        if (status === 401 && isRefresh && refreshConfig) {
           if (refresh === null) {
             try {
               refresh = apiRequest(refreshConfig);
@@ -94,15 +89,13 @@ export const apiRequestRedux = (config) => {
           return;
         }
         const errorParsed = await parseJSON(err);
-        errorCodes.includes(status) &&
-          useDefaultErrorHandler &&
-        (await onErrorFnc(errorParsed, dispatch));
+        errorCodes.includes(status) && useDefaultErrorHandler && (await onErrorFnc(errorParsed, dispatch));
         onError && (await onError(errorParsed, dispatch));
-        }
+      }
       return Promise.reject(err);
     }
   };
   return apiRequest;
 };
 
-export const abortRequest = dispatch
+export const abortRequest = dispatch;
