@@ -4,6 +4,7 @@ ApiRequestRedux works only with redux.
 ```$ npm i api-request-redux```
 ## Usage
 ```import { apiRequestRedux } from 'api-req-redux';```
+```import { abortRequest } from 'api-req-redux';```
 
 ```apiRequestRedux``` - it is a function that takes global configuration object,
  and store it for apiRequest function, which you will use to perform actual request
@@ -19,10 +20,12 @@ ApiRequestRedux works only with redux.
 Than use apiRequest to create request:
 ``` 
     export const login = data => async dispatch => {
+      abortRequest('test');
       await apiRequest({
         url: '/api/login',
         body: data,
         method: 'POST',
+        abortName: 'test'
         onStart: (dispatch) => dispatch(({ type: 'login/start' })),
         onSuccess: (data, dispatch) => dispatch(({ type: 'login/success', payload: data })),
         onError: (err, dispatch) => dispatch(({ type: 'login/error', payload: err }))
@@ -57,6 +60,7 @@ Than use apiRequest to create request:
     - onStart - functions that called before fetch, you can use it to change redux store before make request
     - onError - functions that called when fetch fail, you can use it to change redux store, and perform error handling. Takes error as parameter
     - onSuccess - functions that called when fetch successed, you can use it to change redux store, and perform success handleing. Takes data as parameter
+    - onFinally - functions that called when fetch is finished  
     - selector - function, use it to select data from your store and pass as request body, takes state as parameter.
     - credentials - credentials for this request, by default `defaultCredentials`
     - useDefaultErrorHandler - boolean, if you dont want to use defaultError handling on this request set it to `false`, by default - `true`
@@ -66,8 +70,9 @@ Than use apiRequest to create request:
       ```    
     - bodyParser - using this function you can replace default ```JSON.stringify(body)``` and modify body as you want
     - isRefresh - boolean, in case you don't want to
-    - withoutBaseUrl - boolean 
-    call refresh token on this request (default: true)
-      
-    
+    - withoutBaseUrl - boolean call refresh token on this request (default: true)
+    - abortName - string
+ - abortRequest (use this function to abort the one or more requests)
+   - key - string, should be equal to the ```abortName``` parameter that you pass into ```apiRequest``` function call
+   - index - for cases when you have multiple requests with the same key, but you want to abort specific one 
 

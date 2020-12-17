@@ -28,6 +28,7 @@ export const apiRequestRedux = config => {
       onStart,
       onError,
       onSuccess,
+      onFinally,
       selector = () => null,
       credentials = defaultCredentials,
       useDefaultErrorHandler = true,
@@ -93,6 +94,8 @@ export const apiRequestRedux = config => {
         onError && (await onError(errorParsed, dispatch));
       }
       return Promise.reject(err);
+    } finally {
+      onFinally && (await onFinally(dispatch));
     }
   };
   return apiRequest;
