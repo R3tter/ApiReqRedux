@@ -39,8 +39,9 @@ export const apiRequestRedux = config => {
       isRefresh = true
     } = requestConfig;
     const { getState, dispatch } = store ? store() : { getState: () => null, dispatch: () => null };
-    const controller = new AbortController();
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     abortName &&
+      controller &&
       subscribe(abortName, () => {
         controller.abort();
         unSubscribe(abortName);
@@ -57,7 +58,7 @@ export const apiRequestRedux = config => {
         credentials,
         headers: finalHeaders,
         body: payload,
-        signal: controller.signal
+        ...(controller && { signal: controller.signal })
       });
 
       if (!result.ok) {
